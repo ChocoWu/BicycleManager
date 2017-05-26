@@ -20,6 +20,8 @@ import javax.swing.JPasswordField;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
+import database.DatabaseOp;
+
 //import com.lzw.dao.Dao;
 
 import login.Login;
@@ -43,8 +45,6 @@ public class CorrectPassword extends JInternalFrame {
 						+ "</b></html>");
 				userName.setText("<html><b>" + user.getuserName()
 						+ "</b></html>");
-//				BicycleNum.setText("<html><b>"+user.getBicycleNo()
-//				        +"<b><html>");
 			}
 		});	
 		
@@ -98,22 +98,7 @@ public class CorrectPassword extends JInternalFrame {
 		gridBagConstraints_5.gridx = 1;
 		gridBagConstraints_5.fill = GridBagConstraints.HORIZONTAL;
 		getContentPane().add(userName, gridBagConstraints_5);
-        
-//		final JLabel label_4 = new JLabel();
-//		label_4.setFont(new Font("", Font.PLAIN, 14));
-//		label_4.setText("车  牌  号：");
-//		final GridBagConstraints gridBagConstraints_6 = new GridBagConstraints();
-//		gridBagConstraints_6.gridy = 3;
-//		gridBagConstraints_6.gridx = 0;
-//		getContentPane().add(label_4, gridBagConstraints_6);
-
-//		BicycleNum = new JLabel();
-//		final GridBagConstraints gridBagConstraints_7 = new GridBagConstraints();
-//		gridBagConstraints_7.gridy = 3;
-//		gridBagConstraints_7.gridx = 1;
-//		gridBagConstraints_7.fill = GridBagConstraints.HORIZONTAL;
-//		getContentPane().add(BicycleNum, gridBagConstraints_7);
-//		
+       
 		final JLabel label_5 = new JLabel();
 		label_5.setFont(new Font("", Font.PLAIN, 14));
 		label_5.setText("旧  密  码：");
@@ -177,13 +162,18 @@ public class CorrectPassword extends JInternalFrame {
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
 				if (oldPass.getText().equals(user.getPass())) {
+//					System.out.println(user.getPass());
 					if (newPass1.getText().equals(newPass2.getText())) {
 						user.setPass(newPass1.getText());
-						//Dao.updateUser(user);
-						oldPass.setText(null);
-						newPass1.setText(null);
-						newPass2.setText(null);
-						JOptionPane.showMessageDialog(getContentPane(), "密码修改成功。");
+						if(DatabaseOp.update("update UserList set pass='" + user.getPass() + "' where logName='"
+								+ user.getlogName() + "'")>=1){
+							oldPass.setText(null);
+							newPass1.setText(null);
+							newPass2.setText(null);
+							JOptionPane.showMessageDialog(getContentPane(), "密码修改成功。");
+						}else{
+							JOptionPane.showMessageDialog(getContentPane(), "密码修改异常");
+						}
 					}else {
 						JOptionPane.showMessageDialog(getContentPane(), "两次输入的密码不一致，请重新输入。");
 					}

@@ -1,7 +1,7 @@
 package model;
 
 public class UserInfo {
-	private String  id;
+//	private String  id;
 	private String UserName;//用户姓名
 	private String LogName;//昵称
 	private String Usex;//性别
@@ -13,19 +13,20 @@ public class UserInfo {
 	private String domiNo;//宿舍号
 	private String BicycleNo;//自行车车牌号
 	private String pass;//密码
+	private String Quan;
 	
 	
 	public UserInfo(){}
 	
-	public UserInfo(String id)
-	{
-		this.id=id;
-	}
+//	public UserInfo(String id)
+//	{
+//		this.id=id;
+//	}
 	
 	public UserInfo(String id,String UserName,String LogName,String Usex,String dept,String major,String UserNum,String XueBu
 			,String Blocks,String domiNo,String BicycleNo,String pass )
 	{
-		this.id=id;
+//		this.id=id;
 		this.UserName=UserName;
 		this.LogName=LogName;
 		this.Usex=Usex;
@@ -38,14 +39,14 @@ public class UserInfo {
 		this.BicycleNo=BicycleNo;
 		this.pass=pass;
 	}
-	public String getId()
-	{
-		return id;
-	}
-	public void setId(String id)
-	{
-		this.id=id;
-	}
+//	public String getId()
+//	{
+//		return id;
+//	}
+//	public void setId(String id)
+//	{
+//		this.id=id;
+//	}
 	public String getUserName()
 	{
 		return UserName;
@@ -133,6 +134,13 @@ public class UserInfo {
 	public void setPassword(String pass)
 	{
 		this.pass=pass;
+	}
+	public String getQuan()
+	{
+		return Quan;
+	}
+	public void setQuan(String Quan){
+		this.Quan=Quan;
 	}
 	
 }

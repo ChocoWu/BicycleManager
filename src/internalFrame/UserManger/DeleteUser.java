@@ -14,6 +14,7 @@ import java.util.Iterator;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -24,7 +25,7 @@ import database.DatabaseOp;
 import internalFrame.UserManager;
 
 
-public class DeleteUser extends JInternalFrame {
+public class DeleteUser extends JPanel {
 		private JTextField userName;
 		private JTextField userNum;
 		private JTextField bicycleNo;//用户姓名
@@ -50,6 +51,7 @@ public class DeleteUser extends JInternalFrame {
 			add(scrollPane, gridBagConstraints);
 
 			table = new JTable();
+			table.setRowHeight(20);
 			dftm = (DefaultTableModel) table.getModel();
 			columnNames = new String[]{"用户姓名", "专业", "学号", "车牌号"};
 			dftm.setColumnIdentifiers(columnNames);
@@ -59,7 +61,7 @@ public class DeleteUser extends JInternalFrame {
 					int selRow = table.getSelectedRow();
 					uName = table.getValueAt(selRow, 0).toString().trim();
 					uNum = table.getValueAt(selRow, 2).toString().trim();
-					BicyNo = table.getValueAt(selRow, 1).toString().trim();
+					BicyNo = table.getValueAt(selRow, 3).toString().trim();
 					userName.setText(uName);
 					userNum.setText(uNum);
 			        bicycleNo.setText(BicyNo);
@@ -72,7 +74,7 @@ public class DeleteUser extends JInternalFrame {
 			gridBagConstraints_3.gridy = 2;
 			gridBagConstraints_3.gridx = 0;
 			add(label, gridBagConstraints_3);
-			label.setText("用户姓名：");
+			label.setText("用户名：");
 
 			userName = new JTextField();
 			userName.setEditable(false);
@@ -129,8 +131,8 @@ public class DeleteUser extends JInternalFrame {
 					int op = JOptionPane.showConfirmDialog(DeleteUser.this,
 							"确认要删除该用户？");
 					if (op == JOptionPane.OK_OPTION) {
-						DatabaseOp.delete("delete tb_userlist where username='"
-								+ userName.getText() + "'");
+						DatabaseOp.delete("delete from UserInfo where bicycleNo='"
+								+ bicycleNo.getText() + "'");
 						userName.setText("");
 						userNum.setText("");
 						bicycleNo.setText("");
@@ -147,8 +149,7 @@ public class DeleteUser extends JInternalFrame {
 			add(button_1, gridBagConstraints_2);
 			button_1.addActionListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {
-					UserManager parent = (UserManager) DeleteUser.this.getRootPane()
-							.getParent();
+					UserManager parent = (UserManager) DeleteUser.this.getRootPane().getParent();
 					parent.doDefaultCloseAction();
 				}
 			});

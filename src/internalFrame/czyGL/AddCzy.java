@@ -108,10 +108,9 @@ public class AddCzy extends JPanel {
 				String loginName = logName.getText();
 				String czyName = name.getText();
 				String password = new String(passwordField.getPassword());
-				UserList user = DatabaseOp.getUser(loginName, password);//通过数据库查询得到
+				UserList user = DatabaseOp.Login(loginName, password);//通过数据库查询得到
 				if (user.getlogName() != null && !user.getlogName().isEmpty()) {
-					JOptionPane.showMessageDialog(AddCzy.this,
-							"此登录名称已经存在");
+					JOptionPane.showMessageDialog(AddCzy.this,"此登录名称已经存在");
 					name.setFocusable(true);
 					return;
 				}
@@ -125,7 +124,7 @@ public class AddCzy extends JPanel {
 				} else if (passwordField.getText().equals(
 						passwordField_1.getText())) {
 					UserList userList = new UserList();
-					userList.setQuan("a");//权限a为管理员，b为普通用户
+					userList.setQuan("1");//权限1为管理员，0为普通用户
 					userList.setPass(passwordField_1.getText());
 					userList.setlogName(logName.getText().trim());
 					userList.setuserName(name.getText().trim());

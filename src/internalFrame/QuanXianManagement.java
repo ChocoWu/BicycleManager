@@ -7,6 +7,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,12 +22,12 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
 import database.DatabaseOp;
-import internalFrame.management.Item;
 import login.Login;
 import model.UserList;
 
@@ -33,13 +35,22 @@ public class QuanXianManagement extends JInternalFrame {
 	private JTextField LogName;//用户登录姓名
 	private JComboBox quanXian;
 	private JTextField username;//用户姓名
-	private JTextField password;//登录密码
+	private JPasswordField password;//登录密码
 	private JButton modifyButton;//修改按钮
 	private JButton closeButton;//关闭按钮
 	private JComboBox userCombo;//选择用户
+	private UserList user;
+//	private String logName=Login.getUser().getlogName();
 	
 	public QuanXianManagement()
 	{
+		super();
+		//窗体激活事件
+		addInternalFrameListener(new InternalFrameAdapter(){
+			public void internalFrameActivated( final InternalFrameEvent e){
+				initCombox();
+			}
+		});
 		setClosable(true);
 		setIconifiable(true);
 		setVisible(true);
@@ -65,7 +76,7 @@ public class QuanXianManagement extends JInternalFrame {
 		final JLabel pass=new JLabel();
 		pass.setText("密码：");
 		setupComponent(pass,0,2,1,0,false);
-		password=new JTextField();
+		password=new JPasswordField();
 		password.setEditable(false);
 		setupComponent(password,1,2,1,100,true);
 		
@@ -88,104 +99,91 @@ public class QuanXianManagement extends JInternalFrame {
 		closeButton = new JButton("关闭");
 		setupComponent(modifyButton,0,5,1,0,false);
 		setupComponent(closeButton,3,5,1,0,false);
-		closeButton.addActionListener(new ActionListener()
-				{
-			public void actionPerformed(ActionEvent e)
-			{
+		closeButton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
 				QuanXianManagement.this.doDefaultCloseAction();
 			}
 				});
-		modifyButton.addActionListener(new ActionListener()
-				{
-			public void actionPerformed(ActionEvent e1)
-			{
+		modifyButton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e1){
 				//处理按钮的事件
-				Item item=(Item)userCombo.getSelectedItem();
 				UserList userList=new UserList();
-				int index=quanXian.getSelectedIndex();
+				int index=quanXian.getSelectedIndex();//得到选中项的索引
+				
 				if(index==0)
-					userList.setQuan("a");
+					userList.setQuan("1");
 				else
-					userList.setQuan("b");
+					userList.setQuan("0");
+				System.out.println(userList.getQuan());
+				userList.setlogName(user.getlogName());
+				userList.setuserName(user.getuserName());
+				userList.setPass(user.getPass());
 				if(DatabaseOp.updateUser(userList)>=1)
-					JOptionPane.showInternalMessageDialog(null, "修改成功");
+					JOptionPane.showMessageDialog(QuanXianManagement.this, "修改成功");
 				else
 					JOptionPane.showMessageDialog(null, "修改失败");
 			}
 				});
-		//窗体激活事件
-		addInternalFrameListener(new InternalFrameAdapter()
-				{
-			public void internalActivated(InternalFrameEvent e)
-			{
-				initCombox();
-			}
-				});
+		
 	}
 	
-	//初始化用户列表
-	public void initCombox()
-	{
-		List UserInfo=DatabaseOp.getUserInfos();//得到目前的用户
-		List<Item> items=new ArrayList<Item>();
+	//初始化用户列表,将数据库的信息添加到JComboBox中
+	public void initCombox(){
+//		List list=DatabaseOp.findForList("select * from UserList");
+		ResultSet rs=DatabaseOp.findForResult("select * from UserList");
+		List<String> list=new ArrayList<String>();
 		userCombo.removeAllItems();
-		for(Iterator iter=UserInfo.iterator();iter.hasNext();)
-		{
-			List elements=(List)iter.next();
-			Item item=new Item();
-			item.setId(elements.get(0).toString().trim());
-			item.setName(elements.get(1).toString().trim());
-			if(items.contains(item))
-				continue;
-			items.add(item);
-			userCombo.addItem(item);
+////	Iterator<String> iter=list.iterator();
+//		while(iter.hasNext()){
+//			List element = iter.next();//强制类型转换
+//			userCombo.addItem(iter.next());
+//		}
+		try {
+			while(rs.next()){
+				list.add(rs.getString(2));
+//				userCombo.addItem(rs.getString(2));
+			}
+			for(Iterator<String> iter=list.iterator();iter.hasNext();){
+				userCombo.addItem(iter.next());
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	// 设置组件位置并添加到容器中
-	private void setupComponent(JComponent component, int gridx,int gridy,int gridwidth,int ipadx,boolean fill)
-	{
+	private void setupComponent(JComponent component, int gridx,int gridy,int gridwidth,int ipadx,boolean fill){
 		final GridBagConstraints gridBC=new GridBagConstraints();
 		gridBC.gridx=gridx;
 		gridBC.gridy=gridy;
 		if(gridwidth>1)
-		{
 			gridBC.gridwidth=gridwidth;
-		}
 		if(ipadx>0)
-		{
 			gridBC.ipadx=ipadx;
-		}
 		gridBC.insets=new Insets(5,1,3,1);
 		if(fill)
-		{
 			gridBC.fill=GridBagConstraints.HORIZONTAL;
-		}
 		add(component,gridBC);
 	}
 	
-	private void doUserSelectAction()
-	{
-		Item selectedItem;
-		if(!(userCombo.getSelectedItem() instanceof Item))
-			return;
-		selectedItem=(Item)userCombo.getSelectedItem();
-		UserList user=DatabaseOp.getUser(selectedItem);
+	private void doUserSelectAction(){
+		Object selectedItem=userCombo.getSelectedItem();
+		user=DatabaseOp.getUser(selectedItem.toString());
 		LogName.setText(user.getlogName());
 		username.setText(user.getuserName());
 		password.setText(user.getPass());
-		if(user.getQuan().equals("a") )
-			quanXian.setSelectedIndex(0);
-		else
-			quanXian.setSelectedIndex(1);
+//		if(user.getQuan().equals("1"))
+//			quanXian.setSelectedIndex(0);
+//		else
+//			quanXian.setSelectedIndex(1);
 	}
 	
 	
 	public static void main(String[] args) 
 	{
-		EventQueue.invokeLater(new Runnable()
-				{
-			public void run()
-			{
+		EventQueue.invokeLater(new Runnable(){
+			public void run(){
 				JFrame frame=new JFrame();
 				frame.setVisible(true);
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

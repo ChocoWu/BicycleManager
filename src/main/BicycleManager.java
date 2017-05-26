@@ -8,6 +8,8 @@ import java.awt.MenuBar;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,13 +34,10 @@ import javax.swing.event.MenuListener;
 
 import internalFrame.CorrectPassword;
 import internalFrame.CreatedIcon;
+import internalFrame.SelectInfo;
 import login.Login;
 
 public class BicycleManager extends JFrame {
-	private JFrame frame;
-	private JPanel panel;
-	private JLabel backLabel;
-	private Map<String,JInternalFrame> map=new HashMap<String, JInternalFrame>();
 	
 	private static final JDesktopPane DESKTOP_PANE = new JDesktopPane();
 	
@@ -54,8 +53,6 @@ public class BicycleManager extends JFrame {
 		getContentPane().add(titleLabel);
 		JMenuBar menuBar = createMenu(); // 调用创建菜单栏的方法
 		add(menuBar, BorderLayout.NORTH);
-//		JToolBar toolBar = createToolBar(); // 调用创建工具栏的方法
-//		getContentPane().add(toolBar, BorderLayout.NORTH);
 		final JLabel label = new JLabel();
 		label.setBounds(0, 0, 400, 300);
 		label.setIcon(null); // 窗体背景
@@ -76,10 +73,12 @@ public class BicycleManager extends JFrame {
 		
 		
 	}
+	
 	// 添加子窗体的方法
 	public static void addIFame(JInternalFrame iframe) {
 			DESKTOP_PANE.add(iframe);
 	}
+	//创建菜单栏
 	public JMenuBar createMenu()
 	{
 		JMenuBar menuBar=new JMenuBar();
@@ -103,7 +102,13 @@ public class BicycleManager extends JFrame {
 		exit.add(MenuActions.EXIT);
 		JMenu info=new JMenu();//从数据库中得到姓名
 		info.setIcon(CreatedIcon.add("userInfo.png"));
-		
+		info.addMouseListener(new MouseAdapter(){
+			public void mouseClicked(MouseEvent e){
+				SelectInfo iframe=new SelectInfo();
+				addIFame(iframe);
+			}
+		});
+	
 		menuBar.add(selectInfo);
 		menuBar.add(operation);
 		menuBar.add(modify);

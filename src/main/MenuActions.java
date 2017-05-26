@@ -8,7 +8,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JInternalFrame;
 
-
+import database.DatabaseOp;
 import internalFrame.CorrectPassword;
 import internalFrame.CzyGL;
 import internalFrame.QuanXianManagement;
@@ -140,7 +140,7 @@ public class MenuActions {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
-			if(frames.containsKey("自行车信息查询")||frames.get("自行车信息查询").isClosed())
+			if(!frames.containsKey("自行车信息查询")||frames.get("自行车信息查询").isClosed())
 			{
 				SelectBicycle iframe=new SelectBicycle();
 				frames.put("自行车信息查询", iframe);
@@ -153,12 +153,13 @@ public class MenuActions {
 	private static class ExitAction extends AbstractAction{
 		@SuppressWarnings("unused")
 		public ExitAction() {
-//			super("退出系统", null);
+			super("退出系统", null);
 			putValue(Action.LONG_DESCRIPTION, "退出校园自行车管理系统");
 			putValue(Action.SHORT_DESCRIPTION, "退出系统");
 		}
 		public void actionPerformed(final ActionEvent e) {
 			System.exit(0);
+			DatabaseOp.close();
 		}
 	}
 	

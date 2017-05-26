@@ -106,6 +106,11 @@ public class AddUser extends JPanel {
 		gridBc_22.gridy = 2;
 		gridBc_22.gridx = 1;
 		add(logName,gridBc_22);
+		JLabel l=new JLabel("(昵称不可更改)");
+		final GridBagConstraints gridBc_05=new GridBagConstraints();
+		gridBc_05.gridy=2;
+		gridBc_05.gridx=3;
+		add(l,gridBc_05);
 		
 		final JLabel label_4=new JLabel();
 		label_4.setText("学院：");
@@ -131,7 +136,7 @@ public class AddUser extends JPanel {
 		gridBc_9.gridy=4;
 		gridBc_9.gridx=0;
 		add(label_5,gridBc_9);
-		Udep=new JTextField();
+		Umaj=new JTextField();
 		final GridBagConstraints gridBc_10=new GridBagConstraints();
 		gridBc_10.weighty = 1.0;
 		gridBc_10.insets = new Insets(0, 0, 0, 10);
@@ -139,7 +144,7 @@ public class AddUser extends JPanel {
 		gridBc_10.gridwidth = 2;
 		gridBc_10.gridy = 4;
 		gridBc_10.gridx = 1;
-		add(Udep,gridBc_10);
+		add(Umaj,gridBc_10);
 		
 		final JLabel label_6=new JLabel();
 		label_6.setText("学号：");;
@@ -250,9 +255,15 @@ public class AddUser extends JPanel {
 		reset=new JButton();
 		reset.addActionListener(new ActionListener()
 				{
-			public void actionPerformed(ActionEvent e)
-			{
-				clear();
+			public void actionPerformed(ActionEvent e){
+				BicycleNo.setText("");
+				Uname.setText("");
+				logName.setText("");
+				Udep.setText("");
+				Umaj.setText("");
+				Unum.setText("");
+				pass1.setText("");
+				pass2.setText("");
 			}
 				});
 		reset.setText("重置");
@@ -266,14 +277,7 @@ public class AddUser extends JPanel {
 	//重置的操作
 	public void clear()
 	{
-		BicycleNo.setText("");
-		Uname.setText("");
-		logName.setText("");
-		Udep.setText("");
-		Umaj.setText("");
-		Unum.setText("");
-		pass1.setText("");
-		pass2.setText("");
+		
 	}
 	
 	//添加确认添加信息按钮的监听事件
@@ -281,19 +285,22 @@ public class AddUser extends JPanel {
 	{
 		public void actionPerformed(ActionEvent e)
 		{
+			
 			if(Uname.getText().equals("") ||Udep.getText().equals("") 
 					|| Umaj.getText().equals("")||BicycleNo.getText().equals("")
 					|| logName.getText().equals("") || pass1.getText().equals("")
 					|| pass2.getText().equals(""))
 			{
+				System.out.println("]]]]]");
 				JOptionPane.showMessageDialog(null, "请填写全部信息");
 				return;
 			}
-			if(!pass1.getText().equals(pass2.getText()))
+			while(!pass1.getText().equals(pass2.getText()))
 			{
 				JOptionPane.showMessageDialog(null, "两次输入的密码不一致，请重新输入");
+				return ;
 			}
-			ResultSet users=DatabaseOp.query("select * from userList where logName='"+logName.getText().trim()+"'");
+			ResultSet users=DatabaseOp.findForResult("select * from userList where logName='"+logName.getText().trim()+"'");
 			try{
 				if(users.next())
 				{
@@ -306,45 +313,30 @@ public class AddUser extends JPanel {
 			{
 				ex.printStackTrace();
 			}
-			ResultSet set=DatabaseOp.query("select max(id) from userInfo");
-			String id=null;
-			try{
-				if(set!=null && set.next())
-				{
-					String sid=set.getString(1);
-					if(sid==null)
-						id="yh1001";
-					else{
-						String str=sid.substring(2);
-						id="yh"+(Integer.parseInt(str)+1);
-					}
-				}
-			}catch(Exception e1)
-			{
-				e1.printStackTrace();
-			}
 			UserInfo userInfo=new UserInfo();
 			UserList userList=new UserList();
 			userList.setuserName(Uname.getText().trim());
 			userList.setlogName(logName.getText().trim());
 			userList.setPass(pass1.getText().trim());
-			userList.setQuan("b");
+			userList.setQuan("0");
 			
-			userInfo.setId(id);
+			userInfo.setBicycleNo(BicycleNo.getText().trim());
 			userInfo.setUserName(Uname.getText().trim());
+			userInfo.setLogName(logName.getText().trim());
 			userInfo.setUsex(Usex.getSelectedItem().toString().trim());
 			userInfo.setdept(Udep.getText().trim());
 			userInfo.setmajor(Umaj.getText().trim());
 			userInfo.setUserNum(Unum.getText().trim());
-			userInfo.setBicycleNo(BicycleNo.getText().trim());
+			userInfo.setPassword(pass1.getText().trim());
 			userInfo.setXueBu(XueBu.getSelectedItem().toString().trim());
 			userInfo.setBlocks(block.getSelectedItem().toString().trim());
 			userInfo.setdomiNo(domiNo.getSelectedItem().toString().trim());
-			DatabaseOp.addUser(userInfo);
-			DatabaseOp.addCzy(userList);
-			JOptionPane.showMessageDialog(AddUser.this, "用户添加成功", "添加用户信息", JOptionPane.INFORMATION_MESSAGE);
-			reset.doClick();
-			
+			if( DatabaseOp.addCzy(userList)>0 && DatabaseOp.addUser(userInfo)>0 && DatabaseOp.update("insert BicycleList values('"+BicycleNo.getText()+"','1')")>0){
+				JOptionPane.showMessageDialog(AddUser.this, "用户添加成功", "添加用户信息", JOptionPane.INFORMATION_MESSAGE);
+				reset.doClick();
+			}else{
+				JOptionPane.showMessageDialog(AddUser.this, "用户添加失败", "添加用户信息", JOptionPane.INFORMATION_MESSAGE);
+			}
 		}
 	}
 

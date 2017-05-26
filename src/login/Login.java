@@ -10,6 +10,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -69,12 +70,14 @@ public class Login extends JFrame{
 				{
 					user = DatabaseOp.Login(loginName.getText(), userPassword.getText());
 					if (user.getPass() == null || user.getlogName() == null) {
-						loginName.setText(null);
-						userPassword.setText(null);
+						JOptionPane.showMessageDialog(getContentPane(), "登录名或密码错误");
+//						loginName.setText(null);
+//						userPassword.setText(null);
+						reset.doClick();
 						return;
 					}
 					setVisible(false);
-					
+					userInfo=DatabaseOp.getUserInfo(loginName.getText());
 					new BicycleManager();
 				}
 			});
@@ -120,8 +123,7 @@ public class Login extends JFrame{
 		
 		//通过登录可查询到用户的全部信息
 		public static UserInfo getUserInfo() {
-			// TODO Auto-generated method stub
-			userInfo=DatabaseOp.getInfo(loginName.getText());
+//			userInfo=DatabaseOp.getUserInfo(loginName.getText());
 			return userInfo;
 		}	
 }
